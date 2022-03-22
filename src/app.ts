@@ -19,8 +19,8 @@ class Server {
     }
 
     public config(): void {
-        // Settings
-        this.app.set('port', process.env.PORT || 3000);
+        // Settings, our server listen to port 4000
+        this.app.set('port', process.env.PORT || 4000);
         // middlewares
         this.app.use(morgan('dev'));
         //this.app.use(express.json());
