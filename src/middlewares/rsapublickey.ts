@@ -1,5 +1,5 @@
-// import * as bcu from 'bigint-crypto-utils';
-const bcu = require('bigint-crypto-utils');
+import * as bcu from 'bigint-crypto-utils';
+// const bcu = require('bigint-crypto-utils');
 
 //modelo Aliado = Enemigo
 class RsaPublicKey {

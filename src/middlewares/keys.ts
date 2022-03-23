@@ -1,7 +1,9 @@
-// import * as bcu from 'bigint-crypto-utils';
-const bcu = require('bigint-crypto-utils');
-const RsaPrivateKey = require('./rsaprivatekey');
-const RsaPublicKey = require('./rsaprivatekey');
+import * as bcu from 'bigint-crypto-utils';
+import { RsaPrivateKey } from './rsaprivatekey';
+import { RsaPublicKey } from './rsapublickey';
+// const bcu = require('bigint-crypto-utils');
+// const RsaPrivateKey = require('./rsaprivatekey');
+// const RsaPublicKey = require('./rsaprivatekey');
 // import { RsaPrivateKey } from "./rsaprivatekey";
 // import { RsaPublicKey } from "./rsapublickey";
 
@@ -30,10 +32,8 @@ export async function generateKeys (bitlength: number = 3072){
     while (bcu.bitLength(n) !== bitlength || (phi % e === 0n));
     const publicKey = new RsaPublicKey(e, n);
     const d = bcu.modInv(e, phi);
-    const privKey = new RsaPrivateKey(d, n);
-    return 
-    {
-    };
+    const privateKey = new RsaPrivateKey(d, n);
+    return { publicKey, privateKey} ;
 }
 
 //another unused functions
