@@ -1,5 +1,6 @@
 import express from 'express';
 import morgan from 'morgan';
+import config from './config';
 //import helmet from 'helmet';
 //import compression from 'compression';
 //import cors from 'cors';
@@ -20,7 +21,7 @@ class Server {
 
     public config(): void {
         // Settings, our server listen to port 4000
-        this.app.set('port', process.env.PORT || 4000);
+        this.app.set('port', config.PORT);
         // middlewares
         this.app.use(morgan('dev'));
         //this.app.use(express.json());

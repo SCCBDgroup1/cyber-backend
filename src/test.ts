@@ -1,7 +1,7 @@
 //import * as bcu from 'bigint-crypto-utils';
 // import { decrypt, encrypt, generateKeys } from './middlewares/keys';
-const decrypt = require('./middlewares/keys.ts');
-const encrypt = require('./middlewares/keys.ts');
+const decrypt = require('./middlewares/keys');
+const encrypt = require('./middlewares/keys');
 
 //message TX->RX
 const message = 'hello';
