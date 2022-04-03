@@ -1,11 +1,10 @@
 import * as bcu from 'bigint-crypto-utils';
 import { RsaPrivateKey } from './rsaprivatekey';
 import { RsaPublicKey } from './rsapublickey';
-// const bcu = require('bigint-crypto-utils');
-// const RsaPrivateKey = require('./rsaprivatekey');
-// const RsaPublicKey = require('./rsaprivatekey');
-// import { RsaPrivateKey } from "./rsaprivatekey";
-// import { RsaPublicKey } from "./rsapublickey";
+
+//define this variables because we cannot use top imports
+let myRsaPublicKey: RsaPublicKey;
+let myRsaPrivateKey: RsaPrivateKey;
 
 // export async function generateRandomKeys (bitlength: number = 3072, simpleVariant: boolean = false): Promise<KeyPair> {
 //     let p, q, n, g, lambda, mu
@@ -19,91 +18,38 @@ import { RsaPublicKey } from './rsapublickey';
 
 //blind message          
 export async function blinding (m: bigint){
-
-    //we choose predefined prime - public exponent
-    //65537=2**16+1
-    const e = 65537n;
-    const bitlength: number = 3072;
-
-    //we prove with 5 & 7- this part very problematic!!
-    //these numbers have to be a random numbers
-    // let n: bigint =5n;
-    // let r: bigint =7n;
-    let r, n, extraN, extraPhi;
-
+    let coprimes;
+    // k=myRsaPrivateKey.k
+    // let k;
     do 
     {
-        r = await bcu.prime(bitlength / 2 + 1);
-        n = await bcu.prime(bitlength / 2);
-        extraN = r * n;
-        extraPhi = (r - 1n) * (n - 1n);
+        //mask coef - random number between 0 and n
+        myRsaPrivateKey.k = bcu.randBetween(myRsaPublicKey.n,0n);
+        //do the great common divisor
+        coprimes= bcu.gcd(myRsaPrivateKey.k, myRsaPublicKey.n);
     } 
-    while (bcu.bitLength(extraN) !== bitlength || (extraPhi % e === 0n));
+    while (coprimes!==1n);
 
+    //we extract the product (m · k^e)
+    const kPow: bigint=myRsaPrivateKey.k**myRsaPublicKey.e;
+    const finalResult: bigint= m*kPow;
 
-    //do the great common divisor
-    const coprimes: bigint= bcu.gcd(r,n);
-
-    //we check if two numbers are coprimes
-    if(coprimes!==1n){
-        console.log("error");
-    } else {
-        console.log("working");
-    }
-
-    //we extract the product (m * r**e) * mod n
-    const eNum = Number(e);
-    const rNum = Number(r);
-    const rPowToE: number = Math.pow(rNum,eNum);
-    const rPowToEBig: bigint = BigInt(rPowToE);
-    const finalResult: bigint= m*rPowToEBig; 
-
-    //we need check e & n
-    return bcu.modPow(finalResult,e,n);
+    //other params: pow=1 & Bob's n 
+    return bcu.modPow(finalResult,1n,myRsaPublicKey.n);
 }
 
 export async function unblinding (m: bigint){
+    // k=myRsaPrivateKey.k
+    // let k=60n;
 
-    //we choose predefined prime - public exponent
-    //65537=2**16+1
-    const e = 65537n;
-    const bitlength: number = 3072;
+    //we calculate modular inverse for r·mod(n)
+    const rInv:bigint= bcu.modInv(myRsaPrivateKey.k, myRsaPublicKey.n);
 
-    //we prove with 5 & 7- this part very problematic!!
-    //these numbers have to be a random numbers
-    // let n: bigint =5n;
-    // let r: bigint =7n;
-    let r, n, extraN, extraPhi;
+    //we extract the product (s' · r^-1)
+    const finalResult: bigint= m*rInv; 
 
-    do 
-    {
-        r = await bcu.prime(bitlength / 2 + 1);
-        n = await bcu.prime(bitlength / 2);
-        extraN = r * n;
-        extraPhi = (r - 1n) * (n - 1n);
-    } 
-    while (bcu.bitLength(extraN) !== bitlength || (extraPhi % e === 0n));
-
-
-    //do the great common divisor
-    const coprimes: bigint= bcu.gcd(r,n);
-
-    //we check if two numbers are coprimes
-    if(coprimes!==1n){
-        console.log("error");
-    } else {
-        console.log("working");
-    }
-
-    //we extract the product mxr**e
-    const eNum = Number(e);
-    const rNum = Number(r);
-    const rPowToE: number = Math.pow(rNum,eNum);
-    const rPowToEBig: bigint = BigInt(rPowToE);
-    const finalResult: bigint= m*rPowToEBig; 
-
-    //we need check e & n
-    return bcu.modPow(finalResult,e,n);
+    //other params: pow=1 & Bob's n 
+    return bcu.modPow(finalResult,1n,myRsaPublicKey.n);
 }
 
 export async function generateKeys (bitlength: number = 3072){

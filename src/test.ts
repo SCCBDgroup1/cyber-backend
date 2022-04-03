@@ -36,11 +36,16 @@ const main = async function(){
     const m2= bcu.randBetween(keypair2.publicKey.n-1n);
     const blindmessage=await blinding(m2);
     const signmessage=keypair2.privateKey.sign(blindmessage);
+    //now the message is blinded
     //we don't know if verifymessage or unblindmessage is the first???
-    const verifymessage=keypair2.publicKey.verify(signmessage);
-    console.log(signmessage)
-    const unblindmessage= await unblinding(verifymessage);
-    if(m2 !== unblindmessage){
+    const unblindmessage= await unblinding(signmessage);
+    const verifymessage=keypair2.publicKey.verify(unblindmessage);
+
+    //bob signs the message with his private key - only for check
+    const privateSignMessage=keypair2.privateKey.sign(m2);
+
+    //final check
+    if(verifymessage !==privateSignMessage){
         console.log("error");
     }
     else{

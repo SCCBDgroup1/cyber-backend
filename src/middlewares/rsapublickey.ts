@@ -1,8 +1,16 @@
 import * as bcu from 'bigint-crypto-utils';
-// const bcu = require('bigint-crypto-utils');
 
-//modelo Aliado = Enemigo
-class RsaPublicKey {
+//RsaPublicKey interface
+interface RsaPublicKeyInterface {
+    e: bigint;
+    n: bigint;
+    n2: bigint;
+    encrypt(m: bigint): bigint;
+    verify(c: bigint): bigint;
+}
+
+//RsaPublicKey model
+class RsaPublicKey implements RsaPublicKeyInterface {
 
     //variables
     e: bigint;

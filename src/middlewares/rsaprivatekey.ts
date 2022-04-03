@@ -1,15 +1,29 @@
 import * as bcu from 'bigint-crypto-utils';
-// const bcu = require('bigint-crypto-utils');
+
+//RsaPrivateKey interface
+interface RsaPrivateKeyInterface {
+    d: bigint;
+    n: bigint;
+    k: bigint;
+    decrypt(c: bigint): bigint;
+    sign(m: bigint): bigint;
+}
 
 //RsaPrivateKey model
-class RsaPrivateKey {
+class RsaPrivateKey implements RsaPrivateKeyInterface {
 
     //variables
     d: bigint;
     n: bigint;
+    k!: bigint;
 
     //constuctor
-    constructor(d: bigint, n: bigint){
+    constructor(d: bigint, n: bigint, k?: bigint){
+        if(k){
+            this.k=k;
+            this.n=n;
+            this.d=d;
+        }
         this.d=d;
         this.n=n;
     }
