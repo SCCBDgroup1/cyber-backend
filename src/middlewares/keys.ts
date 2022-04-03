@@ -17,6 +17,95 @@ import { RsaPublicKey } from './rsapublickey';
 //     } while (q === p || bcu.bitLength(n) !== bitlength)
 // }
 
+//blind message          
+export async function blinding (m: bigint){
+
+    //we choose predefined prime - public exponent
+    //65537=2**16+1
+    const e = 65537n;
+    const bitlength: number = 3072;
+
+    //we prove with 5 & 7- this part very problematic!!
+    //these numbers have to be a random numbers
+    // let n: bigint =5n;
+    // let r: bigint =7n;
+    let r, n, extraN, extraPhi;
+
+    do 
+    {
+        r = await bcu.prime(bitlength / 2 + 1);
+        n = await bcu.prime(bitlength / 2);
+        extraN = r * n;
+        extraPhi = (r - 1n) * (n - 1n);
+    } 
+    while (bcu.bitLength(extraN) !== bitlength || (extraPhi % e === 0n));
+
+
+    //do the great common divisor
+    const coprimes: bigint= bcu.gcd(r,n);
+
+    //we check if two numbers are coprimes
+    if(coprimes!==1n){
+        console.log("error");
+    } else {
+        console.log("working");
+    }
+
+    //we extract the product (m * r**e) * mod n
+    const eNum = Number(e);
+    const rNum = Number(r);
+    const rPowToE: number = Math.pow(rNum,eNum);
+    const rPowToEBig: bigint = BigInt(rPowToE);
+    const finalResult: bigint= m*rPowToEBig; 
+
+    //we need check e & n
+    return bcu.modPow(finalResult,e,n);
+}
+
+export async function unblinding (m: bigint){
+
+    //we choose predefined prime - public exponent
+    //65537=2**16+1
+    const e = 65537n;
+    const bitlength: number = 3072;
+
+    //we prove with 5 & 7- this part very problematic!!
+    //these numbers have to be a random numbers
+    // let n: bigint =5n;
+    // let r: bigint =7n;
+    let r, n, extraN, extraPhi;
+
+    do 
+    {
+        r = await bcu.prime(bitlength / 2 + 1);
+        n = await bcu.prime(bitlength / 2);
+        extraN = r * n;
+        extraPhi = (r - 1n) * (n - 1n);
+    } 
+    while (bcu.bitLength(extraN) !== bitlength || (extraPhi % e === 0n));
+
+
+    //do the great common divisor
+    const coprimes: bigint= bcu.gcd(r,n);
+
+    //we check if two numbers are coprimes
+    if(coprimes!==1n){
+        console.log("error");
+    } else {
+        console.log("working");
+    }
+
+    //we extract the product mxr**e
+    const eNum = Number(e);
+    const rNum = Number(r);
+    const rPowToE: number = Math.pow(rNum,eNum);
+    const rPowToEBig: bigint = BigInt(rPowToE);
+    const finalResult: bigint= m*rPowToEBig; 
+
+    //we need check e & n
+    return bcu.modPow(finalResult,e,n);
+}
+
 export async function generateKeys (bitlength: number = 3072){
 
     //be careful with this BiggestInt because the version of the tsconfig.json changes
@@ -36,13 +125,13 @@ export async function generateKeys (bitlength: number = 3072){
     return { publicKey, privateKey} ;
 }
 
-//another unused functions
+//basic silly encrypt function - Not use!
 export const encrypt = function (exemple: string){
     const reverse = exemple.split('').reverse().join('');
     return 'encrypted' + reverse;
 }
 
-//another const
+//basic silly decrypt function - Not use!
 export const decrypt = (exemple: string) => {
     const script = exemple.substring(10);
     return script.split('').reverse().join('');
