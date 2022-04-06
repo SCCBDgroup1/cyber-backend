@@ -4,7 +4,6 @@ import * as bcu from 'bigint-crypto-utils';
 interface RsaPrivateKeyInterface {
     d: bigint;
     n: bigint;
-    k: bigint;
     decrypt(c: bigint): bigint;
     sign(m: bigint): bigint;
 }
@@ -15,15 +14,9 @@ class RsaPrivateKey implements RsaPrivateKeyInterface {
     //variables
     d: bigint;
     n: bigint;
-    k!: bigint;
 
     //constuctor
-    constructor(d: bigint, n: bigint, k?: bigint){
-        if(k){
-            this.k=k;
-            this.n=n;
-            this.d=d;
-        }
+    constructor(d: bigint, n: bigint){
         this.d=d;
         this.n=n;
     }

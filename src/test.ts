@@ -31,21 +31,19 @@ const main = async function(){
     }
 
     //2nd - check if blinding & unblinding works with public & private keys
-    //we cand send the same message, search randBetween & how bigints work?
     const keypair2= await generateKeys(bitLength);
     const m2= bcu.randBetween(keypair2.publicKey.n-1n);
-    const blindmessage=await blinding(m2);
+    const blindmessage=await blinding(m2, keypair2.publicKey);
     const signmessage=keypair2.privateKey.sign(blindmessage);
     //now the message is blinded
-    //we don't know if verifymessage or unblindmessage is the first???
-    const unblindmessage= await unblinding(signmessage);
-    const verifymessage=keypair2.publicKey.verify(unblindmessage);
+    const unblindSignature= await unblinding(signmessage, keypair2.publicKey);
+    const verifySignature=keypair2.publicKey.verify(unblindSignature);
 
     //bob signs the message with his private key - only for check
-    const privateSignMessage=keypair2.privateKey.sign(m2);
+    // const privateSignMessage=keypair2.privateKey.sign(m2);
 
     //final check
-    if(verifymessage !==privateSignMessage){
+    if(m2 !==verifySignature){
         console.log("error");
     }
     else{
