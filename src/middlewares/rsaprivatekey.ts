@@ -8,6 +8,8 @@ interface RsaPrivateKeyInterface {
     sign(m: bigint): bigint;
 }
 
+//generate a function that returns a promise
+
 //RsaPrivateKey model
 class RsaPrivateKey implements RsaPrivateKeyInterface {
 

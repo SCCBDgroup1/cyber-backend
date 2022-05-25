@@ -1,7 +1,62 @@
-POST https://example.com/comments HTTP/1.1
+### 
+GET http://localhost:3000/api/pub/2048
+
+###
+POST http://localhost:3000/api/encrypt
 content-type: application/json
 
 {
-    "name": "sample",
-    "time": "Wed, 21 Oct 2015 18:27:50 GMT"
+    "message": "mensaje cualquiera..."
 }
+
+###
+POST http://localhost:3000/api/decrypt
+content-type: application/json
+
+{
+    "cyphertext": "texto cifradoo..."
+}
+
+###
+POST http://localhost:3000/api/sign
+content-type: application/json
+
+{
+    "blindmessage": "mensaje cegado..."
+}
+
+###
+POST http://localhost:3000/api/verify
+content-type: application/json
+
+{
+    "unblindSignature": "firma descegada..."
+}
+
+###
+POST http://localhost:3000/api/blinding
+content-type: application/json
+
+{
+    "message": "mensaje...",
+    "publicKey": "clave publica..."
+}
+
+###
+POST http://localhost:3000/api/unblinding
+content-type: application/json
+
+{
+    "signMessage": "mensaje firmado...",
+    "publicKey": "clave publica..."
+}
+
+### GET http://localhost:3000/api/encrypt/anymessage
+
+### GET http://localhost:3000/api/users/60c4f100aaaa0a33e4e27ebd
+
+### GET http://localhost:3000/api/users/60c4f116aaaa0a33e4e27ebe
+
+### GET http://localhost:3000/api/users/chat/60c4f116aaaa0a33e4e27ebe
+
+### DELETE http://localhost:3000/api/users/:id

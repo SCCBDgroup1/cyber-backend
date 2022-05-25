@@ -1,7 +1,8 @@
 import * as bcu from 'bigint-crypto-utils';
 import * as paillierBigint from 'paillier-bigint';
 //if we need to convert
-import * as bigintConversion from 'bigint-conversion';
+//import * as bigintConversion from 'bigint-conversion';
+import {split, combine} from 'shamirs-secret-sharing-ts';
 import { RsaPrivateKey } from './rsaprivatekey';
 import { RsaPublicKey } from './rsapublickey';
 
@@ -75,13 +76,44 @@ export async function paillierTest () {
     // homomorphic addition of two ciphertexts (encrypted numbers)
     const c2 = publicKey.encrypt(m2)
     const encryptedSum = publicKey.addition(c1, c2)
-    console.log(privateKey.decrypt(encryptedSum)) // m1 + m2 = 12345678901234567895n
-  
+    //no addition en principio multiply
+    const decryptedSum = privateKey.decrypt(encryptedSum)
+    //console.log(privateKey.decrypt(encryptedSum)) // m1 + m2 = 12345678901234567895n
+    console.log(decryptedSum)
+
     // multiplication by k
     const k = 10n
+    //en principio es potenccia de k a la m2
     const encryptedMul = publicKey.multiply(c1, k)
-    console.log(privateKey.decrypt(encryptedMul)) // k · m1 = 123456789012345678900n
-  }
+    const decryptedMul = privateKey.decrypt(encryptedMul)
+    //console.log(privateKey.decrypt(encryptedMul)) // k · m1 = 123456789012345678900n
+    console.log(decryptedMul)
+
+    //final check
+    if(m1+m2!==decryptedSum){
+        console.log("error");
+    }
+    else{
+        console.log("working");
+    }
+
+}
+
+export async function shamirSecretSharing(){
+    //15 guys keep a secret and only 4 can opened
+    const secret = Buffer.from('secret key');
+    const shares=split(secret, {shares: 10, threshold: 4});
+    const recovered= combine(shares.slice(3, 7));
+    const recoveredToString=recovered.toString();
+
+    //final check
+    if('secret key' !==recoveredToString){
+        console.log("error");
+    }
+    else{
+        console.log("working");
+    }    
+}
 
 
 export async function generateKeys (bitlength: number = 3072){
