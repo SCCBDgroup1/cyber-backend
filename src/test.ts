@@ -57,11 +57,11 @@ const main = async function(){
     //{}
 
     //check if paillier works
-    paillierTest();
+    //paillierTest();
 
     //check if shamir secret sharing works
     //works
-    //shamirSecretSharing();
+    shamirSecretSharing();
 }
 
 main();

@@ -81,7 +81,7 @@ export async function paillierTest () {
     //console.log(privateKey.decrypt(encryptedSum)) // m1 + m2 = 12345678901234567895n
     console.log(decryptedSum)
 
-    // multiplication by k
+    // multiplication by k, this is our k
     const k = 10n
     //en principio es potenccia de k a la m2
     const encryptedMul = publicKey.multiply(c1, k)
@@ -100,14 +100,19 @@ export async function paillierTest () {
 }
 
 export async function shamirSecretSharing(){
-    //15 guys keep a secret and only 4 can opened
-    const secret = Buffer.from('secret key');
+    const shamirMessage = 12345678901234567890n;
+    const shamirMessageToString = shamirMessage.toString()
+    //const shamirMessage = 'secret key';
+    //we need pass to string 
+    const secret = Buffer.from(shamirMessageToString);
+    //the secret is splitted into 10 different guys and oly 4 can open it!
     const shares=split(secret, {shares: 10, threshold: 4});
+    //in this case until the guy 3 to guy 6 can open the secret formula!
     const recovered= combine(shares.slice(3, 7));
     const recoveredToString=recovered.toString();
 
     //final check
-    if('secret key' !==recoveredToString){
+    if(shamirMessageToString !==recoveredToString){
         console.log("error");
     }
     else{
