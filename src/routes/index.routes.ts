@@ -21,3 +21,5 @@ indexRouter.get('/pub/:bitLength', generateKeys);
 //indexRouter.post('/unblinding', unblinding);
 
 //indexRouter.post('/paillier', paillierTest);
+
+export default indexRouter;

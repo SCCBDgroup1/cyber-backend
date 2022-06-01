@@ -1,5 +1,5 @@
 ### 
-GET http://localhost:3000/api/pub/2048
+GET http://localhost:3000/
 
 ###
 POST http://localhost:3000/api/encrypt
