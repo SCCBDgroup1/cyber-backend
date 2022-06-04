@@ -2,7 +2,7 @@ import express from 'express';
 import morgan from 'morgan';
 import config from './config';
 import cors from 'cors';
-import indexRouter from './routes/index.routes';
+import indexRouter from './routes/indexRoutes';
 //import helmet from 'helmet';
 //import compression from 'compression';
 //import cors from 'cors';
@@ -13,7 +13,7 @@ import indexRouter from './routes/index.routes';
 
 const app = express();
 
-app.use(cors({origin: 'http://localhost:4200'}));
+app.use(cors({origin: 'http://localhost:8000'}));
 app.use(cors({origin: '*'}));
 
 app.use(morgan('dev'));

@@ -1,10 +1,12 @@
 import * as bcu from 'bigint-crypto-utils';
 import * as paillierBigint from 'paillier-bigint';
+import bc from 'bigint-conversion';
 //if we need to convert
 //import * as bigintConversion from 'bigint-conversion';
 import {split, combine} from 'shamirs-secret-sharing-ts';
 import { RsaPrivateKey } from './rsaprivatekey';
 import { RsaPublicKey } from './rsapublickey';
+import {Request, Response} from 'express';
 
 // export async function generateRandomKeys (bitlength: number = 3072, simpleVariant: boolean = false): Promise<KeyPair> {
 //     let p, q, n, g, lambda, mu
@@ -15,6 +17,9 @@ import { RsaPublicKey } from './rsapublickey';
 //       n = p * q
 //     } while (q === p || bcu.bitLength(n) !== bitlength)
 // }
+
+const rsaKeyPairPromise = generateKeys(512)
+const rsaPaillierKeyPairPromise = paillierBigint.generateRandomKeys(512);
 
 //blind message          
 export async function blinding (m: bigint, publicKey: RsaPublicKey): Promise<bigint> {
@@ -60,7 +65,7 @@ export async function unblinding (m: bigint, publicKey: RsaPublicKey): Promise<b
 //a function check paillier
 export async function paillierTest () {
     // (asynchronous) creation of a random private, public key pair for the Paillier cryptosystem
-    const { publicKey, privateKey } = await paillierBigint.generateRandomKeys(3072)
+    const { publicKey, privateKey } = await paillierBigint.generateRandomKeys(512)
   
     // Optionally, you can create your public/private keys from known parameters
     // const publicKey = new paillierBigint.PublicKey(n, g)
@@ -81,13 +86,14 @@ export async function paillierTest () {
     //console.log(privateKey.decrypt(encryptedSum)) // m1 + m2 = 12345678901234567895n
     console.log(decryptedSum)
 
-    // multiplication by k, this is our k
-    const k = 10n
-    //en principio es potenccia de k a la m2
-    const encryptedMul = publicKey.multiply(c1, k)
-    const decryptedMul = privateKey.decrypt(encryptedMul)
-    //console.log(privateKey.decrypt(encryptedMul)) // k · m1 = 123456789012345678900n
-    console.log(decryptedMul)
+    //another way to implement Paillier
+    // // multiplication by k, this is our k
+    // const k = 10n
+    // //en principio es potenccia de k a la m2
+    // const encryptedMul = publicKey.multiply(c1, k)
+    // const decryptedMul = privateKey.decrypt(encryptedMul)
+    // //console.log(privateKey.decrypt(encryptedMul)) // k · m1 = 123456789012345678900n
+    // console.log(decryptedMul)
 
     //final check
     if(m1+m2!==decryptedSum){
@@ -121,7 +127,7 @@ export async function shamirSecretSharing(){
 }
 
 
-export async function generateKeys (bitlength: number = 3072){
+export async function generateKeys (bitlength: number){
 
     //be careful with this BiggestInt because the version of the tsconfig.json changes
     const e = 65537n;
@@ -153,3 +159,81 @@ export const decrypt = (exemple: string) => {
 }
 
 //shamir secret sharing function
+
+//requests for the clients
+
+export const apiGenerateKeys = async (req: Request, res: Response) => {
+    try{
+        const keyPair = await rsaKeyPairPromise;
+        res.status(200).send({
+            e: bc.bigintToHex(keyPair.publicKey.e),
+            n: bc.bigintToHex(keyPair.publicKey.n),
+        });
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
+
+export const apiGeneratePaillierKeys = async (req: Request, res: Response) => {
+    try{
+        const paillierKeyPair = await rsaPaillierKeyPairPromise;
+        console.log("paso por aqui")
+        res.status(200).send({
+            n: bc.bigintToHex(paillierKeyPair["publicKey"]["n"]),
+            g: bc.bigintToHex(paillierKeyPair["publicKey"]["g"])
+        });
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
+
+export const apiSign = async (req: Request, res: Response) => {
+    try{
+        const blindMessage=req.body.message;
+        console.log("Blind message sent by the client:", blindMessage);
+        //necesitamos poder acceder a las claves de RSA
+        const signMessage=(await rsaKeyPairPromise).privateKey.sign(bc.hexToBigint(blindMessage));
+        console.log("Blind message sign:", {signMessage: bc.bigintToHex(signMessage)});
+        res.status(200).send({
+            signMessage: bc.bigintToHex(signMessage)
+        });
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
+
+export const apiDecrypt = async (req: Request, res: Response) => {
+    try{
+        const encryptMessage=req.body.message;
+        console.log("Message encrypted", encryptMessage);
+        //necesitamos poder acceder a las claves de RSA
+        const originalMessage=(await rsaKeyPairPromise).privateKey.decrypt(bc.hexToBigint(encryptMessage));
+        console.log("Original Message", {originalMessage: bc.bigintToHex(originalMessage)});
+        res.status(200).send({
+            originalMessage: bc.bigintToHex(originalMessage)
+        });
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
+
+//not work yet!
+export const apiPostPaillier = async (req: Request, res: Response) => {
+    try{
+        console.log("----------")
+        const message=bc.hexToBigint(req.body.message);
+        console.log("Sum encrypted votes:", message);
+        //necesitamos poder acceder a las claves de RSA
+        const decryptSum=(await rsaPaillierKeyPairPromise).privateKey.decrypt(message);
+        const votes= ("00" +decryptSum).slice(-3);
+        console.log("Sum messages: ", votes);
+        const digits=decryptSum.toString().split("");
+        console.log("votes A:" +digits[0]);
+        console.log("votes B:" +digits[1]);
+        console.log("votes C:" +digits[2]);
+        console.log("----------");
+        res.status(200).send({message: bc.bigintToHex(decryptSum)});
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
