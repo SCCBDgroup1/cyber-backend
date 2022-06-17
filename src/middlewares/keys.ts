@@ -166,8 +166,8 @@ export const apiGenerateKeys = async (req: Request, res: Response) => {
     try{
         const keyPair = await rsaKeyPairPromise;
         res.status(200).send({
-            e: bc.bigintToHex(keyPair.publicKey.e),
-            n: bc.bigintToHex(keyPair.publicKey.n),
+            e: keyPair.publicKey.e.toString(),
+            n: keyPair.publicKey.n.toString(),
         });
     } catch (error) {
         res.status(500).send(error);
@@ -177,10 +177,9 @@ export const apiGenerateKeys = async (req: Request, res: Response) => {
 export const apiGeneratePaillierKeys = async (req: Request, res: Response) => {
     try{
         const paillierKeyPair = await rsaPaillierKeyPairPromise;
-        console.log("paso por aqui")
         res.status(200).send({
-            n: bc.bigintToHex(paillierKeyPair["publicKey"]["n"]),
-            g: bc.bigintToHex(paillierKeyPair["publicKey"]["g"])
+            n: paillierKeyPair["publicKey"]["n"].toString(),
+            g: paillierKeyPair["publicKey"]["g"].toString(),
         });
     } catch (error) {
         res.status(500).send(error);
@@ -192,10 +191,10 @@ export const apiSign = async (req: Request, res: Response) => {
         const blindMessage=req.body.message;
         console.log("Blind message sent by the client:", blindMessage);
         //necesitamos poder acceder a las claves de RSA
-        const signMessage=(await rsaKeyPairPromise).privateKey.sign(bc.hexToBigint(blindMessage));
-        console.log("Blind message sign:", {signMessage: bc.bigintToHex(signMessage)});
+        const signMessage=(await rsaKeyPairPromise).privateKey.sign(BigInt(blindMessage));
+        console.log("Blind message sign:", {signMessage: (signMessage).toString()});
         res.status(200).send({
-            signMessage: bc.bigintToHex(signMessage)
+            signMessage: signMessage.toString(),
         });
     } catch (error) {
         res.status(500).send(error);
@@ -207,10 +206,10 @@ export const apiDecrypt = async (req: Request, res: Response) => {
         const encryptMessage=req.body.message;
         console.log("Message encrypted", encryptMessage);
         //necesitamos poder acceder a las claves de RSA
-        const originalMessage=(await rsaKeyPairPromise).privateKey.decrypt(bc.hexToBigint(encryptMessage));
-        console.log("Original Message", {originalMessage: bc.bigintToHex(originalMessage)});
+        const originalMessage=(await rsaKeyPairPromise).privateKey.decrypt(BigInt(encryptMessage));
+        console.log("Original Message", {originalMessage: originalMessage.toString()});
         res.status(200).send({
-            originalMessage: bc.bigintToHex(originalMessage)
+            originalMessage: originalMessage.toString(),
         });
     } catch (error) {
         res.status(500).send(error);
@@ -221,7 +220,7 @@ export const apiDecrypt = async (req: Request, res: Response) => {
 export const apiPostPaillier = async (req: Request, res: Response) => {
     try{
         console.log("----------")
-        const message=bc.hexToBigint(req.body.message);
+        const message=BigInt(req.body.message);
         console.log("Sum encrypted votes:", message);
         //necesitamos poder acceder a las claves de RSA
         const decryptSum=(await rsaPaillierKeyPairPromise).privateKey.decrypt(message);
@@ -232,7 +231,7 @@ export const apiPostPaillier = async (req: Request, res: Response) => {
         console.log("votes B:" +digits[1]);
         console.log("votes C:" +digits[2]);
         console.log("----------");
-        res.status(200).send({message: bc.bigintToHex(decryptSum)});
+        res.status(200).send({message: decryptSum.toString()});
     } catch (error) {
         res.status(500).send(error);
     }

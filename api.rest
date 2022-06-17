@@ -1,31 +1,31 @@
 ### 
-GET http://localhost:3000/api/rsa/pubKey
+GET http://localhost:4000/api/rsa/pubKey
 
 ### 
-GET http://localhost:3000/api/paillier/pubKey
+GET http://localhost:4000/api/paillier/pubKey
 
 ###
-POST http://localhost:3000/api/rsa/sign
+POST http://localhost:4000/api/rsa/sign
 content-type: application/json
 
 {
-    "message": "blindMessage"
+    "message": "143353535"
 }
 
 ###
-POST http://localhost:3000/api/rsa/decrypt
+POST http://localhost:4000/api/rsa/decrypt
 content-type: application/json
 
 {
-    "message": "paquitomola"
+    "message": "87687687687687"
 }
 
 ###
-POST http://localhost:3000/api/paillier/decrypt
+POST http://localhost:4000/api/paillier/decrypt
 content-type: application/json
 
 {
-    "message": "decryptingg"
+    "message": "110"
 }
 
 ### DELETE http://localhost:3000/api/users/:id

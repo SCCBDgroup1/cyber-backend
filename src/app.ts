@@ -13,7 +13,7 @@ import indexRouter from './routes/indexRoutes';
 
 const app = express();
 
-app.use(cors({origin: 'http://localhost:8000'}));
+app.use(cors({origin: 'http://localhost:3000'}));
 app.use(cors({origin: '*'}));
 
 app.use(morgan('dev'));
