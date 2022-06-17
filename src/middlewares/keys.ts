@@ -72,7 +72,9 @@ export async function paillierTest () {
     // const privateKey = new paillierBigint.PrivateKey(lambda, mu, publicKey)
   
     const m1 = 12345678901234567890n
+    // const m1= bcu.randBetween(1n, 12345678901234567890n);
     const m2 = 5n
+    // const m2= bcu.randBetween(1n, 12345678901234567890n);
   
     // encryption/decryption
     const c1 = publicKey.encrypt(m1)
@@ -106,7 +108,10 @@ export async function paillierTest () {
 }
 
 export async function shamirSecretSharing(){
+
+    // const shamirMessage= bcu.randBetween(1n, 12345678901234567890n);
     const shamirMessage = 12345678901234567890n;
+
     const shamirMessageToString = shamirMessage.toString()
     //const shamirMessage = 'secret key';
     //we need pass to string 
@@ -130,6 +135,7 @@ export async function shamirSecretSharing(){
 export async function generateKeys (bitlength: number){
 
     //be careful with this BiggestInt because the version of the tsconfig.json changes
+    // const e= bcu.randBetween(1n, 65537n);
     const e = 65537n;
     let p, q, n, phi;
     do 
@@ -195,6 +201,36 @@ export const apiSign = async (req: Request, res: Response) => {
         console.log("Blind message sign:", {signMessage: (signMessage).toString()});
         res.status(200).send({
             signMessage: signMessage.toString(),
+        });
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
+
+export const apiVerify = async (req: Request, res: Response) => {
+    try{
+        const signMessage=req.body.message;
+        console.log("Sign message:", signMessage);
+        //necesitamos poder acceder a las claves de RSA
+        const verifyMessage=(await rsaKeyPairPromise).publicKey.verify(BigInt(signMessage));
+        console.log("Verify message:", {verifyMessage: (verifyMessage).toString()});
+        res.status(200).send({
+            verifyMessage: verifyMessage.toString(),
+        });
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
+
+export const apiEncrypt = async (req: Request, res: Response) => {
+    try{
+        const clearMessage=req.body.message;
+        console.log("Clear message", clearMessage);
+        //necesitamos poder acceder a las claves de RSA
+        const encryptedMessage=(await rsaKeyPairPromise).publicKey.encrypt(BigInt(clearMessage));
+        console.log("Encrypted Message", {encryptedMessage: encryptedMessage.toString()});
+        res.status(200).send({
+            encryptedMessage: encryptedMessage.toString(),
         });
     } catch (error) {
         res.status(500).send(error);
