@@ -13,27 +13,11 @@ content-type: application/json
 }
 
 ###
-POST http://localhost:4000/api/rsa/verify
-content-type: application/json
-
-{
-    "message": "1434545"
-}
-
-###
 POST http://localhost:4000/api/rsa/decrypt
 content-type: application/json
 
 {
     "message": "87687687687687"
-}
-
-###
-POST http://localhost:4000/api/rsa/encrypt
-content-type: application/json
-
-{
-    "message": "876876"
 }
 
 ###
@@ -43,5 +27,3 @@ content-type: application/json
 {
     "message": "110"
 }
-
-### DELETE http://localhost:3000/api/users/:id
