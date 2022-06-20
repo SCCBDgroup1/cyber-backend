@@ -184,8 +184,8 @@ export const apiGeneratePaillierKeys = async (req: Request, res: Response) => {
     try{
         const paillierKeyPair = await rsaPaillierKeyPairPromise;
         res.status(200).send({
-            n: bc.bigintToHex(paillierKeyPair["publicKey"]["n"]),
-            g: bc.bigintToHex(paillierKeyPair["publicKey"]["g"]),
+            e: bc.bigintToHex(paillierKeyPair["publicKey"]["n"]),
+            n: bc.bigintToHex(paillierKeyPair["publicKey"]["g"]),
         });
     } catch (error) {
         res.status(500).send(error);
